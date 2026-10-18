@@ -1,13 +1,18 @@
-import requests
-import streamlit as st
-
+import hashlib
 from pathlib import Path
 import sys
+
+import requests
+import streamlit as st
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from src.utils.uploads import (
+    image_request_files,
+    leaf_request_files,
+)
 from src.utils.config import (
     API_URL,
     APP_NAME,
@@ -27,6 +32,12 @@ if "analysis_result" not in st.session_state:
 
 if "gradcam_image" not in st.session_state:
     st.session_state.gradcam_image = None
+
+if "stem_gradcam_image" not in st.session_state:
+    st.session_state.stem_gradcam_image = None
+
+if "flower_gradcam_image" not in st.session_state:
+    st.session_state.flower_gradcam_image = None
 
 
 st.title(f"{APP_NAME}")
@@ -62,7 +73,7 @@ with st.sidebar:
 
 
 uploaded_file = st.file_uploader(
-    "Upload a plant leaf image",
+    "Leaf image (required)",
     type=[
         "jpg",
         "jpeg",
@@ -72,8 +83,58 @@ uploaded_file = st.file_uploader(
     ],
 )
 
+st.caption(
+    "A leaf image is required for disease prediction. Stem and flower "
+    "images are optional and can be uploaded for separate Grad-CAM views."
+)
+
+with st.expander("Optional stem / flower photos"):
+    st.caption(
+        "Only the leaf photo is used for disease prediction, confidence, "
+        "and recommendations. Stem and flower photos can be sent separately "
+        "for Grad-CAM only. The model was trained on leaves, so their "
+        "heatmaps are experimental activations and do not confirm or locate "
+        "stem/flower disease."
+    )
+    stem_file = st.file_uploader(
+        "Stem photo (optional)",
+        type=["jpg", "jpeg", "png", "webp", "bmp"],
+        key="stem_upload",
+    )
+    flower_file = st.file_uploader(
+        "Flower photo (optional)",
+        type=["jpg", "jpeg", "png", "webp", "bmp"],
+        key="flower_upload",
+    )
+    for part, part_file in (
+        ("stem", stem_file),
+        ("flower", flower_file),
+    ):
+        image_key = f"{part}_image_key"
+        heatmap_key = f"{part}_gradcam_image"
+        if part_file is None:
+            st.session_state[image_key] = None
+            st.session_state[heatmap_key] = None
+        else:
+            part_key = hashlib.sha256(
+                part_file.getvalue()
+            ).hexdigest()
+            if st.session_state.get(image_key) != part_key:
+                st.session_state[image_key] = part_key
+                st.session_state[heatmap_key] = None
+            st.image(
+                part_file,
+                caption=f"{part.title()} photo",
+                use_container_width=True,
+            )
+
 
 if uploaded_file is not None:
+    leaf_key = hashlib.sha256(uploaded_file.getvalue()).hexdigest()
+    if st.session_state.get("leaf_key") != leaf_key:
+        st.session_state.leaf_key = leaf_key
+        st.session_state.analysis_result = None
+        st.session_state.gradcam_image = None
 
     col1, col2 = st.columns(
         [1, 1]
@@ -97,7 +158,7 @@ if uploaded_file is not None:
         )
 
         analyze = st.button(
-            "🔍 Analyze Leaf",
+            "🔍 Analyze Images",
             type="primary",
             use_container_width=True,
         )
@@ -105,18 +166,12 @@ if uploaded_file is not None:
         if analyze:
 
             with st.spinner(
-                "Analyzing image..."
+                "Analyzing leaf image..."
             ):
 
                 try:
 
-                    files = {
-                        "file": (
-                            uploaded_file.name,
-                            uploaded_file.getvalue(),
-                            uploaded_file.type,
-                        )
-                    }
+                    files = leaf_request_files(uploaded_file)
 
                     response = requests.post(
                         f"{API_URL}/predict",
@@ -161,6 +216,8 @@ if uploaded_file is not None:
                 )
 
                 st.session_state.gradcam_image = None
+                st.session_state.stem_gradcam_image = None
+                st.session_state.flower_gradcam_image = None
 
             st.success(
                 "Analysis completed."
@@ -381,83 +438,67 @@ if uploaded_file is not None:
         )
 
         st.write(
-            "Grad-CAM highlights image regions "
-            "that contributed to the model's prediction."
+            "Generate separate Grad-CAM visualizations for each uploaded "
+            "image. Stem and flower visualizations are experimental model "
+            "activations, not verified disease locations."
         )
 
-        explain = st.button(
-            "🧠 Generate Grad-CAM",
-            use_container_width=True,
+        gradcam_inputs = (
+            ("Leaf", uploaded_file, "gradcam_image"),
+            ("Stem", stem_file, "stem_gradcam_image"),
+            ("Flower", flower_file, "flower_gradcam_image"),
         )
 
-        if explain:
+        for label, image_file, result_key in gradcam_inputs:
+            if image_file is None:
+                continue
 
-            with st.spinner(
-                "Generating explanation..."
-            ):
-
-                try:
-
-                    files = {
-                        "file": (
-                            uploaded_file.name,
-                            uploaded_file.getvalue(),
-                            uploaded_file.type,
-                        )
-                    }
-
-                    response = requests.post(
-                        f"{API_URL}/explain",
-                        files=files,
-                        timeout=60,
-                    )
-
-                    if response.status_code != 200:
-
-                        st.error(
-                            f"Grad-CAM generation failed "
-                            f"(HTTP {response.status_code})."
-                        )
-
-                        try:
-                            st.json(
-                                response.json()
-                            )
-                        except Exception:
-                            st.code(
-                                response.text
-                            )
-
-                    else:
-
-                        st.session_state.gradcam_image = (
-                            response.content
-                        )
-
-                except requests.RequestException as exc:
-
-                    st.error(
-                        "Could not connect to "
-                        "the FastAPI backend."
-                    )
-
-                    st.code(
-                        str(exc)
-                    )
-
-
-        if (
-            st.session_state.gradcam_image
-            is not None
-        ):
-
-            st.image(
-                st.session_state.gradcam_image,
-                caption=(
-                    "Grad-CAM attention map"
-                ),
+            if st.button(
+                f"🧠 Generate {label} Grad-CAM",
+                key=f"generate_{label.lower()}_gradcam",
                 use_container_width=True,
-            )
+            ):
+                with st.spinner(
+                    f"Generating {label.lower()} Grad-CAM..."
+                ):
+                    try:
+                        response = requests.post(
+                            f"{API_URL}/explain",
+                            files=image_request_files(image_file),
+                            timeout=60,
+                        )
+                    except requests.RequestException as exc:
+                        st.error(
+                            f"Could not connect to the FastAPI backend "
+                            f"for the {label.lower()} heatmap."
+                        )
+                        st.code(str(exc))
+                    else:
+                        if response.status_code != 200:
+                            st.error(
+                                f"{label} Grad-CAM generation failed "
+                                f"(HTTP {response.status_code})."
+                            )
+                            try:
+                                st.json(response.json())
+                            except ValueError:
+                                st.code(response.text)
+                        else:
+                            st.session_state[result_key] = response.content
+
+            heatmap = st.session_state[result_key]
+            if heatmap is not None:
+                caption = f"{label} Grad-CAM overlay"
+                if label in {"Stem", "Flower"}:
+                    caption += (
+                        " (experimental model activation; not a verified "
+                        "disease location)"
+                    )
+                st.image(
+                    heatmap,
+                    caption=caption,
+                    use_container_width=True,
+                )
 
 
         st.divider()
@@ -520,5 +561,6 @@ if uploaded_file is not None:
 else:
 
     st.info(
-        "Upload a clear plant leaf image to begin."
+        "Upload a clear leaf image to enable disease prediction. "
+        "Stem and flower photos are optional."
     )

@@ -11,7 +11,7 @@ from torchvision.models import (
     efficientnet_b0,
 )
 
-from src.utils.config import MODEL_CHECKPOINT
+from backend.utils.config import MODEL_CHECKPOINT
 
 
 class OODGuard:

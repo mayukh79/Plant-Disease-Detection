@@ -11,11 +11,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.utils.uploads import (
+from backend.utils.uploads import (
     image_request_files,
     leaf_request_files,
 )
-from src.utils.config import (
+from backend.utils.config import (
     API_URL,
     MODEL_NAME,
 )
@@ -31,9 +31,9 @@ st.set_page_config(
     layout="wide",
 )
 
-hero_image = PROJECT_ROOT / "app" / "assets" / "plantvision-hero.jpg"
+hero_image = PROJECT_ROOT / "frontend" / "assets" / "plantvision-hero.jpg"
 hero_image_data = base64.b64encode(hero_image.read_bytes()).decode("ascii")
-botanical_art = PROJECT_ROOT / "app" / "assets" / "landing-botanical.svg"
+botanical_art = PROJECT_ROOT / "frontend" / "assets" / "landing-botanical.svg"
 botanical_art_data = base64.b64encode(botanical_art.read_bytes()).decode("ascii")
 
 st.markdown(
@@ -398,50 +398,50 @@ st.markdown(
         letter-spacing: -.02em;
     }
     .section-description { max-width: 78ch; margin: 0 0 1rem; color: #53614f; font-size: .94rem; line-height: 1.65; }
-    .farm-intro {
-        margin: .5rem 0 1rem;
-        padding: .25rem 1rem .55rem 0;
-        border-bottom: 1px solid #d9e1d2;
-        background-image: linear-gradient(90deg, rgba(247, 247, 240, .98) 0%, rgba(247, 247, 240, .95) 58%, rgba(247, 247, 240, .38) 100%), var(--pv-botanical-art);
-        background-position: center, right center;
-        background-repeat: no-repeat;
-        background-size: cover, 360px auto;
-    }
-    .farm-intro .section-heading { margin-top: .55rem; }
-    .farm-intro .section-description { margin-bottom: .3rem; }
-    .st-key-farm_location_section {
-        margin: .25rem 0 1.5rem;
+    .st-key-farm_location {
+        margin: .5rem 0 1.5rem;
         padding: clamp(1rem, 2vw, 1.5rem);
         border: 1px solid #dedfce;
         border-radius: 20px;
         background: linear-gradient(145deg, #fbfaf3 0%, #f4f6ee 100%);
         box-shadow: 0 10px 26px rgba(44, 56, 37, .055);
     }
-    .st-key-farm_location_section .farm-intro {
-        margin: 0 0 .65rem;
-        padding: .1rem .75rem .7rem 0;
+    .st-key-farm_location .farm-location-eyebrow {
+        margin: 0 0 .25rem;
+        color: #627449;
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: .14em;
+        text-transform: uppercase;
     }
-    .stApp [data-testid="stHorizontalBlock"]:has(.st-key-india_state):has(.st-key-farm_city_district):has(.st-key-farm_pincode):has(.st-key-farm_coordinates) {
-        margin: .45rem 0 .7rem;
-        padding: .75rem .35rem;
-        border-top: 1px solid #e1e4d7;
-        border-bottom: 1px solid #e1e4d7;
-        background: transparent;
-        box-shadow: none;
+    .st-key-farm_location .farm-location-heading {
+        margin: 0 0 .35rem;
+        color: #183d27;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.55rem;
+        font-weight: 700;
+        letter-spacing: -.02em;
     }
-    .stApp [data-testid="stExpander"]:has(.st-key-soil_type) {
+    .st-key-farm_location .farm-location-description {
+        max-width: 78ch;
+        margin: 0 0 .8rem;
+        color: #53614f;
+        font-size: .94rem;
+        line-height: 1.65;
+    }
+    .st-key-farm_location [data-testid="stExpander"] {
         overflow: hidden;
         border: 1px solid #d7e0d2;
         border-radius: 14px;
         background: #fbfaf4;
         box-shadow: 0 5px 16px rgba(42, 56, 34, .035);
     }
-    .stApp [data-testid="stExpander"]:has(.st-key-soil_type) summary {
+    .st-key-farm_location [data-testid="stExpander"] summary {
         padding: .8rem 1rem;
         background: #edf2e7;
         color: #24442d;
     }
-    .stApp [data-testid="stExpander"]:has(.st-key-soil_type) [data-testid="stExpanderDetails"] {
+    .st-key-farm_location [data-testid="stExpanderDetails"] {
         padding: .4rem 1rem .85rem;
         background: #fbfaf4;
     }
@@ -889,7 +889,13 @@ st.markdown(
     }
     @media (max-width: 700px) {
         [data-testid="stMainBlockContainer"] { padding: 1rem 1rem 3rem; }
-        .st-key-farm_location_section { margin-bottom: 1.1rem; padding: 1rem; border-radius: 16px; }
+        .st-key-farm_location { padding: 1rem; border-radius: 16px; }
+        .st-key-farm_location [data-testid="stHorizontalBlock"] { flex-direction: column; gap: .35rem; }
+        .st-key-farm_location [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+            flex: 0 0 auto !important;
+            width: 100% !important;
+            max-width: 100%;
+        }
         .project-masthead { margin-top: -1rem; }
         .site-nav { min-height: 52px; gap: .5rem; padding: .45rem 1rem; }
         .site-nav-brand { gap: .35rem; font-size: 1.12rem; }
@@ -923,24 +929,6 @@ st.markdown(
         .guide-list { grid-template-columns: 1fr; gap: .5rem; }
         .guide-list-item { gap: .65rem; padding: .72rem .75rem; }
         .management-step { gap: .65rem; }
-        .stApp [data-testid="stHorizontalBlock"]:has(.st-key-india_state):has(.st-key-farm_city_district):has(.st-key-farm_pincode):has(.st-key-farm_coordinates) {
-            flex-direction: column;
-            gap: .75rem;
-        }
-        .stApp [data-testid="stHorizontalBlock"]:has(.st-key-india_state):has(.st-key-farm_city_district):has(.st-key-farm_pincode):has(.st-key-farm_coordinates) > [data-testid="stColumn"] {
-            flex: 0 0 auto !important;
-            width: 100% !important;
-            max-width: 100%;
-        }
-        .stApp [data-testid="stExpander"]:has(.st-key-soil_type) [data-testid="stHorizontalBlock"]:has(.st-key-soil_type):has(.st-key-irrigation_routine) {
-            flex-direction: column;
-            gap: .75rem;
-        }
-        .stApp [data-testid="stExpander"]:has(.st-key-soil_type) [data-testid="stHorizontalBlock"]:has(.st-key-soil_type):has(.st-key-irrigation_routine) > [data-testid="stColumn"] {
-            flex: 0 0 auto !important;
-            width: 100% !important;
-            max-width: 100%;
-        }
     }
     @media (max-width: 390px) {
         .st-key-landing_upload [data-testid="stHorizontalBlock"]:has(.st-key-leaf_upload):has(.st-key-stem_upload):has(.st-key-flower_upload) {
@@ -1093,10 +1081,18 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-with st.container(key="farm_location_section"):
+def _sanitize_farm_pincode():
+    value = str(st.session_state.get("farm_location_pincode", ""))
+    st.session_state.farm_location_pincode = "".join(
+        character for character in value if character in "0123456789"
+    )[:6]
+
+
+with st.container(key="farm_location"):
     st.markdown(
-        '<section class="farm-intro"><div class="section-heading">Farm location in India</div>'
-        '<p class="section-description">Select a State or Union Territory, then enter a city, district, PIN code, or GPS coordinates.</p></section>',
+        '<div class="farm-location-eyebrow">Farm details</div>'
+        '<h2 class="farm-location-heading">Farm location in India</h2>'
+        '<p class="farm-location-description">Add a location to keep your screening record grounded in its growing context.</p>',
         unsafe_allow_html=True,
     )
 
@@ -1113,59 +1109,53 @@ with st.container(key="farm_location_section"):
         "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
     ]
 
-    location_col1, location_col2 = st.columns(2)
+    location_col1, location_col2 = st.columns(2, gap="large")
     with location_col1:
         st.selectbox(
             "State / Union Territory",
             india_states_and_uts,
-            key="india_state",
+            key="farm_location_state",
         )
         st.text_input(
             "City or district",
             placeholder="e.g., Lucknow",
-            key="farm_city_district",
+            key="farm_location_city_district",
         )
     with location_col2:
         st.text_input(
             "PIN code (optional)",
             placeholder="6-digit PIN code",
             max_chars=6,
-            key="farm_pincode",
+            key="farm_location_pincode",
+            on_change=_sanitize_farm_pincode,
         )
         st.text_input(
             "GPS coordinates (optional)",
             placeholder="Latitude, longitude",
-            key="farm_coordinates",
+            key="farm_location_coordinates",
         )
 
-    with st.expander("Additional growing conditions (optional)"):
-        st.caption(
-            "These fields are collected for interface context only. They are not "
-            "sent to or used by the current prediction pipeline."
-        )
-
-        context_col1, context_col2 = st.columns(2)
+    with st.expander("Additional growing conditions (optional)", expanded=False):
+        context_col1, context_col2 = st.columns(2, gap="large")
         with context_col1:
             st.text_input(
                 "Soil type (optional)",
                 placeholder="e.g., loamy, sandy, clay",
-                key="soil_type",
+                key="farm_location_soil_type",
             )
         with context_col2:
             st.selectbox(
                 "Irrigation routine (optional)",
                 ["Not specified", "Rain-fed", "Drip", "Sprinkler", "Furrow / flood", "Other"],
-                key="irrigation_routine",
+                key="farm_location_irrigation_routine",
             )
         st.selectbox(
             "Crop growth stage (optional)",
             ["Not specified", "Seedling", "Vegetative", "Flowering", "Fruiting / tuber development", "Maturity"],
-            key="crop_stage",
+            key="farm_location_crop_stage",
         )
         st.info(
-            "The proposed methodology derives temperature from the farm location. "
-            "The current app does not perform a weather lookup, and location does "
-            "not affect the live prediction."
+            "The current app does not perform a weather lookup. Farm location and growing-condition details are collected for context only and do not affect the live prediction."
         )
 
 

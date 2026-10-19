@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 from torchvision.models import EfficientNet_B0_Weights, efficientnet_b0
 
-from src.utils.config import (
+from backend.utils.config import (
     MODEL_CHECKPOINT,
 )
 

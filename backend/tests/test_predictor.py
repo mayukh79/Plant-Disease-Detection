@@ -2,7 +2,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from src.inference.predictor import PlantDiseasePredictor
+from backend.inference.predictor import PlantDiseasePredictor
 
 
 IMAGE_PATH = Path(

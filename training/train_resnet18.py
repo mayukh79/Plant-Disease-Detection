@@ -16,7 +16,7 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-from src.data.dataset_6class import create_dataloaders
+from backend.data.dataset_6class import create_dataloaders
 
 
 # ============================================================

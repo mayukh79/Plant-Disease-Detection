@@ -12,9 +12,8 @@ COPY requirements-ci.txt .
 RUN python -m pip install --upgrade pip && \
     python -m pip install --no-cache-dir -r requirements-ci.txt
 
-COPY app ./app
-COPY src ./src
-COPY knowledge_base ./knowledge_base
+COPY frontend ./frontend
+COPY backend ./backend
 
 COPY models/checkpoints/efficientnet_b0_best.pth \
      ./models/checkpoints/efficientnet_b0_best.pth
@@ -31,4 +30,4 @@ EXPOSE 8501
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()"
 
-CMD ["python", "-m", "uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "backend.api:app", "--host", "0.0.0.0", "--port", "8000"]

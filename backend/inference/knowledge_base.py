@@ -2,8 +2,10 @@ import json
 from pathlib import Path
 
 
-DEFAULT_PATH = Path(
-    "knowledge_base/diseases.json"
+DEFAULT_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "knowledge_base"
+    / "diseases.json"
 )
 
 

@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from PIL import Image
 
-from src.explainability.gradcam import (
+from backend.explainability.gradcam import (
     EfficientNetGradCAM,
 )
 

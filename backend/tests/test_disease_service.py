@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.inference.disease_service import (
+from backend.inference.disease_service import (
     DiseasePredictionService,
 )
 

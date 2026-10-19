@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
 
-from app.api import app
+from backend.api import app
 
 
 client = TestClient(app)

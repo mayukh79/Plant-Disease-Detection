@@ -2,7 +2,7 @@ from io import BytesIO
 
 from PIL import Image
 
-from src.inference.image_quality import ImageQualityAnalyzer
+from backend.inference.image_quality import ImageQualityAnalyzer
 
 
 def create_test_image(

@@ -1,4 +1,4 @@
-from src.inference.knowledge_base import (
+from backend.inference.knowledge_base import (
     DiseaseKnowledgeBase,
 )
 

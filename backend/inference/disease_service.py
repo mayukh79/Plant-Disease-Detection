@@ -3,15 +3,15 @@ from pathlib import Path
 
 from PIL import Image
 
-from src.inference.predictor import (
+from backend.inference.predictor import (
     PlantDiseasePredictor,
 )
 
-from src.inference.knowledge_base import (
+from backend.inference.knowledge_base import (
     DiseaseKnowledgeBase,
 )
 
-from src.utils.config import (
+from backend.utils.config import (
     CALIBRATION_FILE,
     KNOWLEDGE_BASE_FILE,
     MODEL_CHECKPOINT,

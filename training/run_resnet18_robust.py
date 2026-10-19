@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-import src.data.dataset_6class as dataset_module
+import backend.data.dataset_6class as dataset_module
 
 
 # Keep the original dataloader implementation untouched.

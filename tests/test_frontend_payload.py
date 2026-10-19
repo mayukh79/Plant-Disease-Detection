@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from src.utils.uploads import (
+from backend.utils.uploads import (
     image_request_files,
     leaf_request_files,
 )

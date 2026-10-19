@@ -101,6 +101,7 @@ KNOWLEDGE_BASE_FILE = Path(
         "PLANT_KNOWLEDGE_BASE_FILE",
         str(
             PROJECT_ROOT
+            / "backend"
             / "knowledge_base"
             / "diseases.json"
         ),

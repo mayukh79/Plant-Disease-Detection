@@ -1,4 +1,4 @@
-from src.utils.config import (
+from backend.utils.config import (
     API_URL,
     APP_NAME,
     APP_VERSION,

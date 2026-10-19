@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from torchvision import models
 
-from src.data.dataset_6class import create_dataloaders
+from backend.data.dataset_6class import create_dataloaders
 
 
 DATASET_ROOT = "data_split_grouped_6class"

@@ -177,8 +177,8 @@ The Grad-CAM implementation targets the final convolutional feature representati
 Relevant artifacts include:
 
 ```text
-src/explainability/gradcam.py
-src/explainability/generate_gradcam.py
+backend/explainability/gradcam.py
+backend/explainability/generate_gradcam.py
 reports/figures/efficientnet_b0_gradcam_error.png
 ```
 
@@ -199,7 +199,7 @@ The system includes a structured JSON knowledge base for all six supported class
 File:
 
 ```text
-knowledge_base/diseases.json
+backend/knowledge_base/diseases.json
 ```
 
 The knowledge base contains:
@@ -324,7 +324,7 @@ python -m pip install -r requirements-ci.txt
 ## Run the API
 
 ```powershell
-python -m uvicorn app.api:app --host 0.0.0.0 --port 8000
+python -m uvicorn backend.api:app --host 0.0.0.0 --port 8000
 ```
 
 API documentation:
@@ -340,7 +340,7 @@ http://127.0.0.1:8000/docs
 Start the API first, then run:
 
 ```powershell
-streamlit run app/streamlit_app.py
+streamlit run frontend/streamlit_app.py
 ```
 
 Open:
@@ -356,7 +356,7 @@ http://localhost:8501
 Run the complete test suite:
 
 ```powershell
-python -m pytest tests -v
+python -m pytest backend/tests tests -v
 ```
 
 The current API test suite covers:
@@ -442,55 +442,35 @@ Docker configuration is included in the repository, but Docker image constructio
 
 ```text
 plant disease detection/
-│
-├── app/
-│   ├── api.py
+├── frontend/
+│   ├── __init__.py
 │   ├── streamlit_app.py
-│   ├── test_api.py
-│   ├── test_explain_api.py
-│   └── test_predict_explain_sequence.py
-│
-├── knowledge_base/
-│   └── diseases.json
-│
+│   └── assets/
+├── backend/
+│   ├── __init__.py
+│   ├── api.py
+│   ├── explainability/
+│   ├── inference/
+│   ├── knowledge_base/
+│   ├── tests/
+│   └── utils/
+├── tests/
+│   └── test_frontend_payload.py
 ├── models/
 │   └── checkpoints/
-│       └── efficientnet_b0_best.pth
-│
 ├── reports/
 │   ├── figures/
 │   └── results/
-│
-├── src/
-│   ├── explainability/
-│   ├── inference/
-│   └── utils/
-│
-├── tests/
-│   └── test_api.py
-│
 ├── training/
-│   ├── train_efficientnet_b0.py
-│   ├── train_resnet18.py
-│   ├── run_resnet18_robust.py
-│   └── gpu_smoke_test.py
-│
 ├── .github/
 │   └── workflows/
-│       └── ci.yml
-│
-├── .dockerignore
-├── .gitignore
 ├── Dockerfile
-├── MODEL_CARD.md
+├── docker-compose.yml
 ├── README.md
-├── requirements.txt
-├── requirements-ci.txt
-└── requirements-gpu.txt
+└── requirements*.txt
 ```
 
 ---
-
 ## Limitations
 
 - Evaluation is limited to six Potato and Tomato classes.

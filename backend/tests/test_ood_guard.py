@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
-from src.inference.ood_guard import OODGuard
+from backend.inference.ood_guard import OODGuard
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]

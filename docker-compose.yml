@@ -45,7 +45,7 @@ services:
       [
         "streamlit",
         "run",
-        "app/streamlit_app.py",
+        "frontend/streamlit_app.py",
         "--server.address=0.0.0.0",
         "--server.port=8501"
       ]

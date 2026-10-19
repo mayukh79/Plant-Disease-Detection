@@ -10,15 +10,15 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import Response
 from PIL import Image, UnidentifiedImageError
 
-from src.explainability.gradcam import (
+from backend.explainability.gradcam import (
     EfficientNetGradCAM,
 )
-from src.inference.disease_service import (
+from backend.inference.disease_service import (
     DiseasePredictionService,
 )
 
 
-from src.utils.config import (
+from backend.utils.config import (
     ALLOWED_IMAGE_TYPES,
     APP_NAME,
     APP_VERSION,
@@ -27,11 +27,11 @@ from src.utils.config import (
     OOD_ARTIFACT,
 )
 
-from src.inference.image_quality import (
+from backend.inference.image_quality import (
     ImageQualityAnalyzer,
 )
 
-from src.inference.ood_guard import OODGuard
+from backend.inference.ood_guard import OODGuard
 
 
 app = FastAPI(

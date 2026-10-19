@@ -14,7 +14,7 @@ from sklearn.metrics import (
 )
 from torchvision import models
 
-from src.data.dataset_6class import create_dataloaders
+from backend.data.dataset_6class import create_dataloaders
 
 
 MODEL_DIR = Path("models/checkpoints")

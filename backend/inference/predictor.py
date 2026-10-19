@@ -1,4 +1,4 @@
-from src.utils.config import (
+from backend.utils.config import (
     CALIBRATION_FILE,
     MODEL_CHECKPOINT,
     MODEL_NAME,

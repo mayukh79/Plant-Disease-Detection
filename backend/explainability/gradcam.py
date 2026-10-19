@@ -1,4 +1,4 @@
-from src.utils.config import MODEL_CHECKPOINT
+from backend.utils.config import MODEL_CHECKPOINT
 
 from pathlib import Path
 

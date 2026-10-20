@@ -450,6 +450,18 @@ st.markdown(
         border-color: #718b63 !important;
         box-shadow: 0 0 0 3px rgba(113, 139, 99, .16) !important;
     }
+    /* Keep typed values and placeholders readable inside the farm location form. */
+    .stApp .st-key-farm_location [data-testid="stTextInput"] input {
+        color: #24352a !important;
+        -webkit-text-fill-color: #24352a !important;
+        background-color: #fffef9 !important;
+        caret-color: #24352a !important;
+    }
+    .stApp .st-key-farm_location [data-testid="stTextInput"] input::placeholder {
+        color: #687568 !important;
+        -webkit-text-fill-color: #687568 !important;
+        opacity: 1 !important;
+    }
     h2, h3 { font-family: Georgia, "Times New Roman", serif !important; color: #1a3926 !important; }
     h2 { font-size: 1.35rem !important; letter-spacing: -.02em; }
     [data-testid="stFileUploader"] {
@@ -636,6 +648,15 @@ st.markdown(
         background: linear-gradient(100deg, #166534, #15803d);
         box-shadow: 0 7px 16px rgba(22, 101, 52, .18);
         color: #ffffff !important;
+    }
+    .st-key-analyze_images [data-testid="stButton"] > button:disabled {
+        border: 1px solid #9caf98 !important;
+        background: #e4ebdf !important;
+        box-shadow: none !important;
+        color: #294631 !important;
+        -webkit-text-fill-color: #294631 !important;
+        opacity: 1 !important;
+        cursor: not-allowed !important;
     }
     [data-testid="stElementContainer"]:has([data-testid="stHeading"] h3) + [data-testid="stElementContainer"] [data-testid="stButton"] > button[kind="primary"] {
         font-family: 'DM Sans', sans-serif !important;
@@ -964,20 +985,14 @@ st.markdown(
             <span>PlantVision AI</span>
         </a>
         <div class="site-nav-links">
-            <a class="site-nav-home" href="#home">Home</a>
             <a href="#how-it-works">How it works</a>
-            <a class="site-nav-cta" href="#screening-uploader">Get Started</a>
         </div>
     </nav>
     <header class="project-hero" id="home">
         <div class="hero-content">
             <p class="hero-project-name">PlantVision AI</p>
             <h1 class="hero-title">Know Your Plant.<br>Know Your Harvest.</h1>
-            <p class="hero-copy">Screen a leaf and get clear guidance to help protect your harvest.</p>
-            <div class="hero-actions">
-                <a class="hero-cta" href="#screening-uploader">Analyse a Plant <span aria-hidden="true">&rarr;</span></a>
-                <a class="hero-secondary" href="#how-it-works"><span class="hero-play" aria-hidden="true">&#9654;</span> How it works</a>
-            </div>
+            <p class="hero-copy">Screen a leaf , stem and fruit and get clear guidance to help protect your harvest.</p>
         </div>
     </header>
 </div>
@@ -996,8 +1011,8 @@ with st.container(border=True, key="landing_upload"):
         """
         <section class="landing-intro" id="screening-uploader">
             <p class="upload-eyebrow">Get started</p>
-            <h2 class="section-heading">Analyse a Plant Leaf</h2>
-            <p class="section-description">Upload a clear image of a tomato or potato leaf to detect potential diseases and get AI-powered insights.</p>
+            <h2 class="section-heading">Analyse a Plant's Leaf, Stem and Fruit</h2>
+            <p class="section-description">Upload a clear image of a tomato or potato leaf , stem and fruit to detect potential diseases and get AI-powered insights.</p>
         </section>
         """,
         unsafe_allow_html=True,
@@ -1006,14 +1021,15 @@ with st.container(border=True, key="landing_upload"):
     upload_columns = st.columns(3, gap="medium")
     upload_specs = (
         ("Leaf image", "Required · used for disease prediction", "Attach leaf image", "leaf_upload"),
-        ("Stem image", "Optional · Grad-CAM view only", "Attach stem image", "stem_upload"),
-        ("Flower image", "Optional · Grad-CAM view only", "Attach flower image", "flower_upload"),
+        ("Stem image", "Required · used for disease prediction", "Attach stem image", "stem_upload"),
+        ("Fruit image", "Optional ", "Attach fruit image", "flower_upload"),
     )
     uploaded_file = stem_file = flower_file = None
     for column, (label, purpose, widget_label, widget_key) in zip(upload_columns, upload_specs):
         with column:
+            required_marker = ' <span style="color:#b42318">*</span>' if widget_key in ("leaf_upload", "stem_upload") else ""
             st.markdown(
-                f'<div class="landing-field-title">{label}</div><p class="landing-field-purpose">{purpose}</p>',
+                f'<div class="landing-field-title">{label}{required_marker}</div><p class="landing-field-purpose">{purpose}</p>',
                 unsafe_allow_html=True,
             )
             image_file = st.file_uploader(
@@ -1052,34 +1068,9 @@ with st.container(border=True, key="landing_upload"):
             args=("Potato",),
         )
     st.caption(
-        "The leaf image is used for disease prediction. Stem and flower images are sent only to the existing image explanation endpoint."
+        "The leaf , stem and fruit images are used for disease prediction. "
     )
-st.markdown(
-    """
-    <section class="workflow-strip" id="how-it-works">
-        <div class="workflow-heading">
-            <p class="workflow-eyebrow">How it works</p>
-            <h2 class="workflow-main-title">From image to guidance</h2>
-            <p class="workflow-intro">A simple three-step process to help you identify plant diseases and take informed action.</p>
-        </div>
-        <div class="workflow-steps">
-            <article class="workflow-step">
-                <span class="workflow-number">1</span>
-                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="64" cy="57" r="51" fill="#f2eedc"/><path d="M28 87c24-16 37-36 54-65m-37 47c-2-17-10-29-27-37m40 17c3-17 14-28 32-35m-47 48c-14-3-25 1-36 10" stroke="#526c37" stroke-width="3" stroke-linecap="round"/><path d="M45 67c-17-2-25-12-27-27 16 1 26 9 27 27Zm14-20c0-18 10-29 26-35 4 17-5 29-26 35Zm-5 20c-14-6-26-3-35 8 13 9 25 6 35-8Z" fill="#829355" stroke="#526c37" stroke-width="1.5"/><path d="m45 67-18-22m32 2 12-24m-11 48-23 12" stroke="#d6d7a4" stroke-width="1.5"/></svg></span>
-                <div class="workflow-copy"><h3 class="workflow-title">Detect</h3><p class="workflow-note">Upload a tomato or potato leaf image. Our AI analyses the image for potential diseases.</p></div></article>
-            <article class="workflow-step">
-                <span class="workflow-number">2</span>
-                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="65" cy="57" r="51" fill="#f2eedc"/><rect x="25" y="25" width="80" height="53" rx="5" fill="#31543a" stroke="#263c2d" stroke-width="2"/><rect x="31" y="31" width="68" height="41" rx="2" fill="#c9d7ad"/><path d="M37 63c16-9 23-18 34-27m-24 21c-1-10-7-17-16-22m27 12c2-10 8-16 19-20m-27 30c-8-2-14 1-20 6" stroke="#466941" stroke-width="2"/><path d="M66 43c7-8 15-10 24-5-3 10-10 15-21 13 6 1 11 5 14 12-9 4-18 1-22-8-2-4 0-8 5-12Z" fill="#e1a43b" fill-opacity=".9"/><circle cx="81" cy="50" r="8" fill="#d94a2f" fill-opacity=".82"/><path d="M57 79h16m-8 0v10m-19 0h54" stroke="#405747" stroke-width="3" stroke-linecap="round"/></svg></span>
-                <div class="workflow-copy"><h3 class="workflow-title">Explain</h3><p class="workflow-note">See visual explanations using Grad-CAM to understand what the model found.</p></div></article>
-            <article class="workflow-step">
-                <span class="workflow-number">3</span>
-                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="65" cy="57" r="51" fill="#f2eedc"/><path d="M45 27h40v62H45z" fill="#d9d2aa" stroke="#465b37" stroke-width="2.5"/><path d="M55 22h20v12H55z" rx="4" fill="#87975c" stroke="#465b37" stroke-width="2"/><path d="m53 49 4 4 7-8m-11 20 4 4 7-8m-11 20 4 4 7-8" stroke="#315b36" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M70 49h9m-9 16h9m-9 16h9" stroke="#62724c" stroke-width="2.5" stroke-linecap="round"/><path d="M39 84c-8-6-12-13-11-23 10 2 16 8 17 18m48 4c8-6 12-13 11-23-10 2-16 8-17 18" fill="#829355" stroke="#526c37" stroke-width="1.5"/></svg></span>
-                <div class="workflow-copy"><h3 class="workflow-title">Recommend</h3><p class="workflow-note">Get practical, science-backed guidance to manage the issue and protect your crops.</p></div></article>
-        </div>
-    </section>
-    """,
-    unsafe_allow_html=True,
-)
+
 
 def _sanitize_farm_pincode():
     value = str(st.session_state.get("farm_location_pincode", ""))
@@ -1111,15 +1102,19 @@ with st.container(key="farm_location"):
 
     location_col1, location_col2 = st.columns(2, gap="large")
     with location_col1:
+        st.markdown('<div class="landing-field-title">State / Union Territory <span style="color:#b42318">*</span></div>', unsafe_allow_html=True)
         st.selectbox(
             "State / Union Territory",
             india_states_and_uts,
             key="farm_location_state",
+            label_visibility="collapsed",
         )
+        st.markdown('<div class="landing-field-title">City or district <span style="color:#b42318">*</span></div>', unsafe_allow_html=True)
         st.text_input(
             "City or district",
             placeholder="e.g., Lucknow",
             key="farm_location_city_district",
+            label_visibility="collapsed",
         )
     with location_col2:
         st.text_input(
@@ -1154,10 +1149,51 @@ with st.container(key="farm_location"):
             ["Not specified", "Seedling", "Vegetative", "Flowering", "Fruiting / tuber development", "Maturity"],
             key="farm_location_crop_stage",
         )
-        st.info(
-            "The current app does not perform a weather lookup. Farm location and growing-condition details are collected for context only and do not affect the live prediction."
-        )
+        
 
+required_inputs_complete = (
+    uploaded_file is not None
+    and stem_file is not None
+    and st.session_state.get("farm_location_state") not in (None, "Select State / Union Territory")
+    and bool(str(st.session_state.get("farm_location_city_district", "")).strip())
+)
+st.subheader("Ready to analyze")
+analyze = st.button(
+    "Analyze Images",
+    type="primary",
+    use_container_width=True,
+    disabled=not required_inputs_complete,
+    key="analyze_images",
+)
+if not required_inputs_complete:
+    st.caption("To enable analysis, add a leaf image, a stem image, select a state, and enter a city or district.")
+
+st.markdown(
+    """
+    <section class="workflow-strip" id="how-it-works">
+        <div class="workflow-heading">
+            <p class="workflow-eyebrow">How it works</p>
+            <h2 class="workflow-main-title">From image to guidance</h2>
+            <p class="workflow-intro">A simple three-step process to help you identify plant diseases and take informed action.</p>
+        </div>
+        <div class="workflow-steps">
+            <article class="workflow-step">
+                <span class="workflow-number">1</span>
+                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="64" cy="57" r="51" fill="#f2eedc"/><path d="M28 87c24-16 37-36 54-65m-37 47c-2-17-10-29-27-37m40 17c3-17 14-28 32-35m-47 48c-14-3-25 1-36 10" stroke="#526c37" stroke-width="3" stroke-linecap="round"/><path d="M45 67c-17-2-25-12-27-27 16 1 26 9 27 27Zm14-20c0-18 10-29 26-35 4 17-5 29-26 35Zm-5 20c-14-6-26-3-35 8 13 9 25 6 35-8Z" fill="#829355" stroke="#526c37" stroke-width="1.5"/><path d="m45 67-18-22m32 2 12-24m-11 48-23 12" stroke="#d6d7a4" stroke-width="1.5"/></svg></span>
+                <div class="workflow-copy"><h3 class="workflow-title">Detect</h3><p class="workflow-note">Upload a tomato or potato leaf ,stem and fruit image. Our AI analyses the image for potential diseases.</p></div></article>
+            <article class="workflow-step">
+                <span class="workflow-number">2</span>
+                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="65" cy="57" r="51" fill="#f2eedc"/><rect x="25" y="25" width="80" height="53" rx="5" fill="#31543a" stroke="#263c2d" stroke-width="2"/><rect x="31" y="31" width="68" height="41" rx="2" fill="#c9d7ad"/><path d="M37 63c16-9 23-18 34-27m-24 21c-1-10-7-17-16-22m27 12c2-10 8-16 19-20m-27 30c-8-2-14 1-20 6" stroke="#466941" stroke-width="2"/><path d="M66 43c7-8 15-10 24-5-3 10-10 15-21 13 6 1 11 5 14 12-9 4-18 1-22-8-2-4 0-8 5-12Z" fill="#e1a43b" fill-opacity=".9"/><circle cx="81" cy="50" r="8" fill="#d94a2f" fill-opacity=".82"/><path d="M57 79h16m-8 0v10m-19 0h54" stroke="#405747" stroke-width="3" stroke-linecap="round"/></svg></span>
+                <div class="workflow-copy"><h3 class="workflow-title">Explain</h3><p class="workflow-note">See visual explanations using Grad-CAM to understand what the model found.</p></div></article>
+            <article class="workflow-step">
+                <span class="workflow-number">3</span>
+                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="65" cy="57" r="51" fill="#f2eedc"/><path d="M45 27h40v62H45z" fill="#d9d2aa" stroke="#465b37" stroke-width="2.5"/><path d="M55 22h20v12H55z" rx="4" fill="#87975c" stroke="#465b37" stroke-width="2"/><path d="m53 49 4 4 7-8m-11 20 4 4 7-8m-11 20 4 4 7-8" stroke="#315b36" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M70 49h9m-9 16h9m-9 16h9" stroke="#62724c" stroke-width="2.5" stroke-linecap="round"/><path d="M39 84c-8-6-12-13-11-23 10 2 16 8 17 18m48 4c8-6 12-13 11-23-10 2-16 8-17 18" fill="#829355" stroke="#526c37" stroke-width="1.5"/></svg></span>
+                <div class="workflow-copy"><h3 class="workflow-title">Recommend</h3><p class="workflow-note">Get practical, science-backed guidance to manage the issue and protect your crops.</p></div></article>
+        </div>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
 
 if uploaded_file is not None:
     leaf_key = hashlib.sha256(uploaded_file.getvalue()).hexdigest()
@@ -1166,15 +1202,6 @@ if uploaded_file is not None:
         st.session_state.analysis_result = None
         st.session_state.gradcam_images = {}
 
-
-
-
-    st.subheader("Ready to analyze")
-    analyze = st.button(
-        "Analyze Images",
-        type="primary",
-        use_container_width=True,
-    )
 
     if analyze:
 
@@ -1267,11 +1294,11 @@ if uploaded_file is not None:
         )
         st.caption("Use this as a screening aid. A prediction is not a confirmed diagnosis.")
 
-        st.markdown("#### Uploaded plant images")
+        st.markdown("#### Generated Grad-CAM images")
         image_inputs = [
             ("Leaf", uploaded_file),
             ("Stem", stem_file),
-            ("Flower", flower_file),
+            ("Fruit", flower_file),
         ]
         image_inputs = [(label, image) for label, image in image_inputs if image is not None]
         if image_inputs:
@@ -1281,9 +1308,7 @@ if uploaded_file is not None:
                     with st.container(border=True):
                         image_hash = hashlib.sha256(image.getvalue()).hexdigest()
                         cache_key = f"{label}:{image_hash}"
-                        st.markdown(f"**{label}**")
-                        st.image(image.getvalue(), use_container_width=True)
-                        if st.button(f"Generate Grad-CAM", key=f"gradcam_{label.lower().replace(' ', '_')}", use_container_width=True):
+                        if st.button(f"Generate {label} Grad-CAM", key=f"gradcam_{label.lower()}", use_container_width=True):
                             with st.spinner(f"Generating Grad-CAM for {label.lower()} image…"):
                                 try:
                                     explain_response = requests.post(
@@ -1302,11 +1327,11 @@ if uploaded_file is not None:
                         if cache_key in st.session_state.gradcam_images:
                             st.image(
                                 st.session_state.gradcam_images[cache_key],
-                                caption="Grad-CAM overlay",
+                                caption=f"{label} Grad-CAM overlay",
                                 use_container_width=True,
                             )
         else:
-            st.info("No uploaded plant images are available in this session.")
+            st.info("Upload a plant image to generate and view its Grad-CAM explanation.")
 
         quality = result.get("image_quality") or {}
         if quality:
@@ -1425,6 +1450,6 @@ if uploaded_file is not None:
 else:
 
     st.info(
-        "Upload a clear leaf image to enable the live screening. "
-        "Additional plant images and farm context are optional."
+        "Upload a clear leaf and stem image for better screening. "
+        "Additional fruit image and farm context are optional."
     )

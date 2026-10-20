@@ -1165,35 +1165,9 @@ analyze = st.button(
     disabled=not required_inputs_complete,
     key="analyze_images",
 )
+analysis_status_placeholder = st.empty()
 if not required_inputs_complete:
     st.caption("To enable analysis, add a leaf image, a stem image, select a state, and enter a city or district.")
-
-st.markdown(
-    """
-    <section class="workflow-strip" id="how-it-works">
-        <div class="workflow-heading">
-            <p class="workflow-eyebrow">How it works</p>
-            <h2 class="workflow-main-title">From image to guidance</h2>
-            <p class="workflow-intro">A simple three-step process to help you identify plant diseases and take informed action.</p>
-        </div>
-        <div class="workflow-steps">
-            <article class="workflow-step">
-                <span class="workflow-number">1</span>
-                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="64" cy="57" r="51" fill="#f2eedc"/><path d="M28 87c24-16 37-36 54-65m-37 47c-2-17-10-29-27-37m40 17c3-17 14-28 32-35m-47 48c-14-3-25 1-36 10" stroke="#526c37" stroke-width="3" stroke-linecap="round"/><path d="M45 67c-17-2-25-12-27-27 16 1 26 9 27 27Zm14-20c0-18 10-29 26-35 4 17-5 29-26 35Zm-5 20c-14-6-26-3-35 8 13 9 25 6 35-8Z" fill="#829355" stroke="#526c37" stroke-width="1.5"/><path d="m45 67-18-22m32 2 12-24m-11 48-23 12" stroke="#d6d7a4" stroke-width="1.5"/></svg></span>
-                <div class="workflow-copy"><h3 class="workflow-title">Detect</h3><p class="workflow-note">Upload a tomato or potato leaf ,stem and fruit image. Our AI analyses the image for potential diseases.</p></div></article>
-            <article class="workflow-step">
-                <span class="workflow-number">2</span>
-                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="65" cy="57" r="51" fill="#f2eedc"/><rect x="25" y="25" width="80" height="53" rx="5" fill="#31543a" stroke="#263c2d" stroke-width="2"/><rect x="31" y="31" width="68" height="41" rx="2" fill="#c9d7ad"/><path d="M37 63c16-9 23-18 34-27m-24 21c-1-10-7-17-16-22m27 12c2-10 8-16 19-20m-27 30c-8-2-14 1-20 6" stroke="#466941" stroke-width="2"/><path d="M66 43c7-8 15-10 24-5-3 10-10 15-21 13 6 1 11 5 14 12-9 4-18 1-22-8-2-4 0-8 5-12Z" fill="#e1a43b" fill-opacity=".9"/><circle cx="81" cy="50" r="8" fill="#d94a2f" fill-opacity=".82"/><path d="M57 79h16m-8 0v10m-19 0h54" stroke="#405747" stroke-width="3" stroke-linecap="round"/></svg></span>
-                <div class="workflow-copy"><h3 class="workflow-title">Explain</h3><p class="workflow-note">See visual explanations using Grad-CAM to understand what the model found.</p></div></article>
-            <article class="workflow-step">
-                <span class="workflow-number">3</span>
-                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="65" cy="57" r="51" fill="#f2eedc"/><path d="M45 27h40v62H45z" fill="#d9d2aa" stroke="#465b37" stroke-width="2.5"/><path d="M55 22h20v12H55z" rx="4" fill="#87975c" stroke="#465b37" stroke-width="2"/><path d="m53 49 4 4 7-8m-11 20 4 4 7-8m-11 20 4 4 7-8" stroke="#315b36" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M70 49h9m-9 16h9m-9 16h9" stroke="#62724c" stroke-width="2.5" stroke-linecap="round"/><path d="M39 84c-8-6-12-13-11-23 10 2 16 8 17 18m48 4c8-6 12-13 11-23-10 2-16 8-17 18" fill="#829355" stroke="#526c37" stroke-width="1.5"/></svg></span>
-                <div class="workflow-copy"><h3 class="workflow-title">Recommend</h3><p class="workflow-note">Get practical, science-backed guidance to manage the issue and protect your crops.</p></div></article>
-        </div>
-    </section>
-    """,
-    unsafe_allow_html=True,
-)
 
 if uploaded_file is not None:
     leaf_key = hashlib.sha256(uploaded_file.getvalue()).hexdigest()
@@ -1256,7 +1230,7 @@ if uploaded_file is not None:
                 )
 
 
-            st.success(
+            analysis_status_placeholder.success(
                 "Analysis completed."
             )
 
@@ -1442,7 +1416,7 @@ if uploaded_file is not None:
 
         with st.expander("Model details", expanded=False):
             if result.get("model"):
-                st.caption(f"Model: {result['model']}")
+                st.caption("Vit-B/16 model trained on PlantVillage dataset")
             temperature = result.get("temperature")
             if isinstance(temperature, (int, float)):
                 st.caption(f"Calibration temperature: {temperature:.4f}")
@@ -1453,3 +1427,30 @@ else:
         "Upload a clear leaf and stem image for better screening. "
         "Additional fruit image and farm context are optional."
     )
+
+st.markdown(
+    """
+    <section class="workflow-strip" id="how-it-works">
+        <div class="workflow-heading">
+            <p class="workflow-eyebrow">How it works</p>
+            <h2 class="workflow-main-title">From image to guidance</h2>
+            <p class="workflow-intro">A simple three-step process to help you identify plant diseases and take informed action.</p>
+        </div>
+        <div class="workflow-steps">
+            <article class="workflow-step">
+                <span class="workflow-number">1</span>
+                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="64" cy="57" r="51" fill="#f2eedc"/><path d="M28 87c24-16 37-36 54-65m-37 47c-2-17-10-29-27-37m40 17c3-17 14-28 32-35m-47 48c-14-3-25 1-36 10" stroke="#526c37" stroke-width="3" stroke-linecap="round"/><path d="M45 67c-17-2-25-12-27-27 16 1 26 9 27 27Zm14-20c0-18 10-29 26-35 4 17-5 29-26 35Zm-5 20c-14-6-26-3-35 8 13 9 25 6 35-8Z" fill="#829355" stroke="#526c37" stroke-width="1.5"/><path d="m45 67-18-22m32 2 12-24m-11 48-23 12" stroke="#d6d7a4" stroke-width="1.5"/></svg></span>
+                <div class="workflow-copy"><h3 class="workflow-title">Detect</h3><p class="workflow-note">Upload a tomato or potato leaf ,stem and fruit image. Our AI analyses the image for potential diseases.</p></div></article>
+            <article class="workflow-step">
+                <span class="workflow-number">2</span>
+                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="65" cy="57" r="51" fill="#f2eedc"/><rect x="25" y="25" width="80" height="53" rx="5" fill="#31543a" stroke="#263c2d" stroke-width="2"/><rect x="31" y="31" width="68" height="41" rx="2" fill="#c9d7ad"/><path d="M37 63c16-9 23-18 34-27m-24 21c-1-10-7-17-16-22m27 12c2-10 8-16 19-20m-27 30c-8-2-14 1-20 6" stroke="#466941" stroke-width="2"/><path d="M66 43c7-8 15-10 24-5-3 10-10 15-21 13 6 1 11 5 14 12-9 4-18 1-22-8-2-4 0-8 5-12Z" fill="#e1a43b" fill-opacity=".9"/><circle cx="81" cy="50" r="8" fill="#d94a2f" fill-opacity=".82"/><path d="M57 79h16m-8 0v10m-19 0h54" stroke="#405747" stroke-width="3" stroke-linecap="round"/></svg></span>
+                <div class="workflow-copy"><h3 class="workflow-title">Explain</h3><p class="workflow-note">See visual explanations using Grad-CAM to understand what the model found.</p></div></article>
+            <article class="workflow-step">
+                <span class="workflow-number">3</span>
+                <span class="workflow-art" aria-hidden="true"><svg viewBox="0 0 130 110" fill="none"><circle cx="65" cy="57" r="51" fill="#f2eedc"/><path d="M45 27h40v62H45z" fill="#d9d2aa" stroke="#465b37" stroke-width="2.5"/><path d="M55 22h20v12H55z" rx="4" fill="#87975c" stroke="#465b37" stroke-width="2"/><path d="m53 49 4 4 7-8m-11 20 4 4 7-8m-11 20 4 4 7-8" stroke="#315b36" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M70 49h9m-9 16h9m-9 16h9" stroke="#62724c" stroke-width="2.5" stroke-linecap="round"/><path d="M39 84c-8-6-12-13-11-23 10 2 16 8 17 18m48 4c8-6 12-13 11-23-10 2-16 8-17 18" fill="#829355" stroke="#526c37" stroke-width="1.5"/></svg></span>
+                <div class="workflow-copy"><h3 class="workflow-title">Recommend</h3><p class="workflow-note">Get practical, science-backed guidance to manage the issue and protect your crops.</p></div></article>
+        </div>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)

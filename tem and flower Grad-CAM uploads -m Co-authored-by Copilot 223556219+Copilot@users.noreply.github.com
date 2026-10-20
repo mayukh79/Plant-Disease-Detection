@@ -1,0 +1,195 @@
+[1mdiff --git a/app/streamlit_app.py b/app/streamlit_app.py[m
+[1mindex 52f7ece..e3233f0 100644[m
+[1m--- a/app/streamlit_app.py[m
+[1m+++ b/app/streamlit_app.py[m
+[36m@@ -1,13 +1,18 @@[m
+[31m-import requests[m
+[31m-import streamlit as st[m
+[31m-[m
+[32m+[m[32mimport hashlib[m
+ from pathlib import Path[m
+ import sys[m
+ [m
+[32m+[m[32mimport requests[m
+[32m+[m[32mimport streamlit as st[m
+[32m+[m
+ PROJECT_ROOT = Path(__file__).resolve().parents[1][m
+ if str(PROJECT_ROOT) not in sys.path:[m
+     sys.path.insert(0, str(PROJECT_ROOT))[m
+ [m
+[32m+[m[32mfrom src.utils.uploads import ([m
+[32m+[m[32m    image_request_files,[m
+[32m+[m[32m    leaf_request_files,[m
+[32m+[m[32m)[m
+ from src.utils.config import ([m
+     API_URL,[m
+     APP_NAME,[m
+[36m@@ -28,6 +33,12 @@[m [mif "analysis_result" not in st.session_state:[m
+ if "gradcam_image" not in st.session_state:[m
+     st.session_state.gradcam_image = None[m
+ [m
+[32m+[m[32mif "stem_gradcam_image" not in st.session_state:[m
+[32m+[m[32m    st.session_state.stem_gradcam_image = None[m
+[32m+[m
+[32m+[m[32mif "flower_gradcam_image" not in st.session_state:[m
+[32m+[m[32m    st.session_state.flower_gradcam_image = None[m
+[32m+[m
+ [m
+ st.title(f"{APP_NAME}")[m
+ [m
+[36m@@ -62,7 +73,7 @@[m [mwith st.sidebar:[m
+ [m
+ [m
+ uploaded_file = st.file_uploader([m
+[31m-    "Upload a plant leaf image",[m
+[32m+[m[32m    "Leaf image (required)",[m
+     type=[[m
+         "jpg",[m
+         "jpeg",[m
+[36m@@ -72,8 +83,58 @@[m [muploaded_file = st.file_uploader([m
+     ],[m
+ )[m
+ [m
+[32m+[m[32mst.caption([m
+[32m+[m[32m    "A leaf image is required for disease prediction. Stem and flower "[m
+[32m+[m[32m    "images are optional and can be uploaded for separate Grad-CAM views."[m
+[32m+[m[32m)[m
+[32m+[m
+[32m+[m[32mwith st.expander("Optional stem / flower photos"):[m
+[32m+[m[32m    st.caption([m
+[32m+[m[32m        "Only the leaf photo is used for disease prediction, confidence, "[m
+[32m+[m[32m        "and recommendations. Stem and flower photos can be sent separately "[m
+[32m+[m[32m        "for Grad-CAM only. The model was trained on leaves, so their "[m
+[32m+[m[32m        "heatmaps are experimental activations and do not confirm or locate "[m
+[32m+[m[32m        "stem/flower disease."[m
+[32m+[m[32m    )[m
+[32m+[m[32m    stem_file = st.file_uploader([m
+[32m+[m[32m        "Stem photo (optional)",[m
+[32m+[m[32m        type=["jpg", "jpeg", "png", "webp", "bmp"],[m
+[32m+[m[32m        key="stem_upload",[m
+[32m+[m[32m    )[m
+[32m+[m[32m    flower_file = st.file_uploader([m
+[32m+[m[32m        "Flower photo (optional)",[m
+[32m+[m[32m        type=["jpg", "jpeg", "png", "webp", "bmp"],[m
+[32m+[m[32m        key="flower_upload",[m
+[32m+[m[32m    )[m
+[32m+[m[32m    for part, part_file in ([m
+[32m+[m[32m        ("stem", stem_file),[m
+[32m+[m[32m        ("flower", flower_file),[m
+[32m+[m[32m    ):[m
+[32m+[m[32m        image_key = f"{part}_image_key"[m
+[32m+[m[32m        heatmap_key = f"{part}_gradcam_image"[m
+[32m+[m[32m        if part_file is None:[m
+[32m+[m[32m            st.session_state[image_key] = None[m
+[32m+[m[32m            st.session_state[heatmap_key] = None[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            part_key = hashlib.sha256([m
+[32m+[m[32m                part_file.getvalue()[m
+[32m+[m[32m            ).hexdigest()[m
+[32m+[m[32m            if st.session_state.get(image_key) != part_key:[m
+[32m+[m[32m                st.session_state[image_key] = part_key[m
+[32m+[m[32m                st.session_state[heatmap_key] = None[m
+[32m+[m[32m            st.image([m
+[32m+[m[32m                part_file,[m
+[32m+[m[32m                caption=f"{part.title()} photo",[m
+[32m+[m[32m                use_container_width=True,[m
+[32m+[m[32m            )[m
+[32m+[m
+ [m
+ if uploaded_file is not None:[m
+[32m+[m[32m    leaf_key = hashlib.sha256(uploaded_file.getvalue()).hexdigest()[m
+[32m+[m[32m    if st.session_state.get("leaf_key") != leaf_key:[m
+[32m+[m[32m        st.session_state.leaf_key = leaf_key[m
+[32m+[m[32m        st.session_state.analysis_result = None[m
+[32m+[m[32m        st.session_state.gradcam_image = None[m
+ [m
+     col1, col2 = st.columns([m
+         [1, 1][m
+[36m@@ -97,7 +158,7 @@[m [mif uploaded_file is not None:[m
+         )[m
+ [m
+         analyze = st.button([m
+[31m-            "🔍 Analyze Leaf",[m
+[32m+[m[32m            "🔍 Analyze Images",[m
+             type="primary",[m
+             use_container_width=True,[m
+         )[m
+[36m@@ -105,18 +166,12 @@[m [mif uploaded_file is not None:[m
+         if analyze:[m
+ [m
+             with st.spinner([m
+[31m-                "Analyzing image..."[m
+[32m+[m[32m                "Analyzing leaf image..."[m
+             ):[m
+ [m
+                 try:[m
+ [m
+[31m-                    files = {[m
+[31m-                        "file": ([m
+[31m-                            uploaded_file.name,[m
+[31m-                            uploaded_file.getvalue(),[m
+[31m-                            uploaded_file.type,[m
+[31m-                        )[m
+[31m-                    }[m
+[32m+[m[32m                    files = leaf_request_files(uploaded_file)[m
+ [m
+                     response = requests.post([m
+                         f"{API_URL}/predict",[m
+[36m@@ -161,6 +216,8 @@[m [mif uploaded_file is not None:[m
+                 )[m
+ [m
+                 st.session_state.gradcam_image = None[m
+[32m+[m[32m                st.session_state.stem_gradcam_image = None[m
+[32m+[m[32m                st.session_state.flower_gradcam_image = None[m
+ [m
+             st.success([m
+                 "Analysis completed."[m
+[36m@@ -381,83 +438,67 @@[m [mif uploaded_file is not None:[m
+         )[m
+ [m
+         st.write([m
+[31m-            "Grad-CAM highlights image regions "[m
+[31m-            "that contributed to the model's prediction."[m
+[32m+[m[32m            "Generate separate Grad-CAM visualizations for each uploaded "[m
+[32m+[m[32m            "image. Stem and flower visualizations are experimental model "[m
+[32m+[m[32m            "activations, not verified disease locations."[m
+         )[m
+ [m
+[31m-        explain = st.button([m
+[31m-            "🧠 Generate Grad-CAM",[m
+[31m-            use_container_width=True,[m
+[32m+[m[32m        gradcam_inputs = ([m
+[32m+[m[32m            ("Leaf", uploaded_file, "gradcam_image"),[m
+[32m+[m[32m            ("Stem", stem_file, "stem_gradcam_image"),[m
+[32m+[m[32m            ("Flower", flower_file, "flower_gradcam_image"),[m
+         )[m
+ [m
+[31m-        if explain:[m
+[32m+[m[32m        for label, image_file, result_key in gradcam_inputs:[m
+[32m+[m[32m            if image_file is None:[m
+[32m+[m[32m                continue[m
+ [m
+[31m-            with st.spinner([m
+[31m-                "Generating explanation..."[m
+[32m+[m[32m            if st.button([m
+[32m+[m[32m                f"🧠 Generate {label} Grad-CAM",[m
+[32m+[m[32m                key=f"generate_{label.lower()}_gradcam",[m
+[32m+[m[32m                use_container_width=True,[m
+             ):[m
+[31m-[m
+[31m-                try:[m
+[31m-[m
+[31m-                    files = {[m
+[31m-                        "file": ([m
+[31m-                            uploaded_file.name,[m
+[31m-                            uploaded_file.getvalue(),[m
+[31m-                            uploaded_file.type,[m
+[32m+[m[32m                with st.spinner([m
+[32m+[m[32m                    f"Generating {label.lower()} Grad-CAM..."[m
+[32m+[m[32m                ):[m
+[32m+[m[32m                    try:[m
+[32m+[m[32m                        response = requests.post([m
+[32m+[m[32m                            f"{API_URL}/explain",[m
+[32m+[m[32m                            files=image_request_files(image_file),[m
+[32m+[m[32m                            timeout=60,[m
+ 
